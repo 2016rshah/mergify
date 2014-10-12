@@ -137,13 +137,14 @@
 
           document.getElementById('login-button').addEventListener('click', function() {
 
-            var client_id = '03ffe0cac0a0401aa6673c3cf6d02ced'; // Your client id
+            var client_id = 'c5420045770248e9846f1c2c20721cea'; // Your client id
             var redirect_uri = 'http://localhost:8888/'; // Your redirect uri
 
             var state = generateRandomString(16);
 
             localStorage.setItem(stateKey, state);
-            var scope = 'playlist-read-private user-read-private user-read-email';
+             //var scope = 'playlist-read-private user-read-private user-read-email';
+            var scope = 'playlist-read-private playlist-modify-public playlist-modify-private user-read-private user-read-email';
 
             var url = 'https://accounts.spotify.com/authorize';
             url += '?response_type=token';
@@ -160,39 +161,37 @@
         // function onAuthorize(){
             spotifyApi = new SpotifyWebApi();
             spotifyApi.setAccessToken(access_token);
-            var me = "this shouldn't still be here";
-            var playlists;
+            me = "this shouldn't still be here";
             spotifyApi.getMe(function(err, data){
               if(err){console.log(err);}
               else{
-                me = data;
-                spotifyApi.getUserPlaylists(me.id, function(err, data){
-                  if(err){console.log(err);}
-                  else{
-                    console.log("success");
-                    playlists = data.items;
-                    playlist = playlists.filter(function(e){
-                      //this happens way too early for there to be text in playlist1
-                      e.name == $("#playlist1").val();
-                    });
-                    playlist = playlist[0];
-                    console.log(playlist);
+                  me = data;
+                  spotifyApi.getUserPlaylists(me.id, function(err, data){
+                    if(err){console.log(err);}
+                    else{
+                      console.log("success");
+                      playlists = data.items;
+                      playlist = playlists.filter(function(e){
+                        //this happens way too early for there to be text in playlist1
+                        e.name == $("#playlist1").val();
+                      });
+                      playlist = playlist[0];
+                      console.log(playlist);
+                    }
+                  });
+                  var playlistJSON = {
+                    "name": "Test1",
+                    "public" : false
                   }
-                });
+                  spotifyApi.createPlaylist(me.id, playlistJSON, function(err, data){
+                    if(err)
+                        console.log(err);
+                    else{
+                        console.log(data)
+                    }
+                  });
               }
             });
-            
-            // var playlistJSON = {
-            //   "name": "Test1",
-            //   "public" : false
-            // }
-            // spotifyApi.createPlaylist(me.id, playlistJSON, function(err, data){
-            //   if(err)
-            //       console.log(err);
-            //   else{
-            //       console.log(data)
-            //   }
-            // });
         // }
     </script>
 </html>
