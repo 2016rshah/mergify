@@ -29,6 +29,14 @@
         width:57%;
         text-align:center;
       }
+      h1{
+        margin-top:10px;
+        margin-bottom:10px;
+      }
+      h3{
+        margin-top:10px;
+        margin-bottom:10px;
+      }
     </style>
     <script src = "spotify-web-api.js"></script>
   </head>
@@ -36,7 +44,8 @@
   <body>
     <div class="container">
       <div id="login">
-        <h1>Welcome to Mergify!</h1>
+        <h1>Mergify!!</h1>
+        <h3>The playlist merger for Spotify</h3>
         <button id="login-button" class="btn btn-primary">Log in with Spotify</button>
       </div>
       <div id="loggedin">
@@ -48,11 +57,8 @@
     </div>
 
     <script id="user-profile-template" type="text/x-handlebars-template">
-      
-      <h1>Logged in as {{display_name}}</h1>
-      
-
-
+      <h1>Welcome to Mergify!</h1>
+      <h3>Logged in as {{display_name}}</h3>
       <div class="media">
         <div class="pull-left">
           <img class="media-object" width="150" src="{{images.0.url}}" />
