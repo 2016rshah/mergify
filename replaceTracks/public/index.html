@@ -187,7 +187,6 @@
             spotifyApi.getUserPlaylists(me.id, function(err, data){
                 if(err){console.log(err);}
                 else{
-                  console.log("success");
                   playlists = data.items;
                   playlist1 = playlists.filter(function(e){
                     //this happens way too early for there to be text in playlist1
@@ -201,8 +200,11 @@
                   });
                   playlist2 = playlist2[0];
                   console.log(playlist2);
+                  if(playlist1!==undefined && playlist2!==undefined){
+                    mergeTracks(spotifyApi, me, playlist1, playlist2);
+                  }
                 }
-              });
+            });
           }
         }
         function createPlaylistOnLoad(spotifyApi, me){
@@ -217,6 +219,44 @@
                         console.log(data)
                     }
                   });
+        }
+        function mergeTracks(spotifyApi, me, playlist1, playlist2){
+          console.log("tracks!");
+          spotifyApi.getPlaylistTracks(me.id, playlist1.id, function(err, data){
+            if(err){console.log(err);}
+            else{
+              tracks1 = data.items;
+              console.log(tracks1);
+              spotifyApi.getPlaylistTracks(me.id, playlist2.id, function(err, data){
+                if(err){console.log(err);}
+                else{
+                  tracks2 = data.items;
+                  console.log(tracks2);
+                  var toAdd = []
+                  for(var i = 0; i<tracks1.length; i++){
+                    toAdd.push(tracks1[i].track.uri);
+                  }
+                  for(var i = 0; i<tracks2.length; i++){
+                    toAdd.push(tracks2[i].track.uri);
+                  }
+                  console.log(toAdd);
+                  var tracksJSON = {
+                    uris : toAdd,
+                    position:0
+                  }
+                  console.log(tracksJSON);
+                  spotifyApi.addTracksToPlaylist(me.id, "5whmdmTsQ7Df1BcAh7ZaeI", toAdd, function(err, data){
+                    if(err){console.log(err);}
+                    else{
+                      console.log(data);
+                      console.log("added tracks!");
+                    }
+                  })
+                }
+              });
+            }
+          });
+          
         }
     </script>
 </html>
