@@ -54,11 +54,12 @@
           <dl class = "dl-horizontal">
             <div id = "playlistForm">
               <form>
-              <dt>Playlist 1: </dt><dd><input id = "playlist1" type="text" name="First Playlist"></dd>
-              <dt>Playlist 2: </dt><dd><input id = "playlist2" type="text" name="Second Playlist"></dd>
+              <dt>Playlist 1: </dt><dd><input id = "playlist1" type="text" placeholder="First Playlist" class = "form-control"></dd>
+              <dt>Playlist 2: </dt><dd><input id = "playlist2" type="text" placeholder="Second Playlist" class = "form-control"></dd>
+              <dt>New Name??: </dt><dd><input id = "newName" type = "text" placeholder="New Name for Playlist" class = "form-control"></dd>
               </form>
               <br>
-              <dd><button id = "findPlaylist" class = "btn btn-default btn-lg">Find 2 playlists</button></dd>
+              <dd><button id = "start" class = "btn btn-default btn-lg">Start!</button></dd>
             </div>
           </dl>
         </div>
@@ -183,19 +184,17 @@
         // }
 
         function getPlaylistsOnLoad(spotifyApi, me){
-          document.getElementById("findPlaylist").onclick = function(){
+          document.getElementById("start").onclick = function(){
             spotifyApi.getUserPlaylists(me.id, function(err, data){
                 if(err){console.log(err);}
                 else{
                   playlists = data.items;
                   playlist1 = playlists.filter(function(e){
-                    //this happens way too early for there to be text in playlist1
                     return e.name == $("#playlist1").val();
                   });
                   playlist1 = playlist1[0];
                   console.log(playlist1);
                   playlist2 = playlists.filter(function(e){
-                    //this happens way too early for there to be text in playlist1
                     return e.name == $("#playlist2").val();
                   });
                   playlist2 = playlist2[0];
@@ -216,7 +215,7 @@
                     if(err)
                         console.log(err);
                     else{
-                        console.log(data)
+                        playlistCreated = data;
                     }
                   });
         }
@@ -239,19 +238,25 @@
                   for(var i = 0; i<tracks2.length; i++){
                     toAdd.push(tracks2[i].track.uri);
                   }
-                  console.log(toAdd);
-                  var tracksJSON = {
-                    uris : toAdd,
-                    position:0
-                  }
-                  console.log(tracksJSON);
-                  spotifyApi.addTracksToPlaylist(me.id, "5whmdmTsQ7Df1BcAh7ZaeI", toAdd, function(err, data){
-                    if(err){console.log(err);}
-                    else{
-                      console.log(data);
-                      console.log("added tracks!");
-                    }
-                  })
+                  playlistJSON = {
+                    "name":$("#newName").val(),
+                    "public":true
+                  };
+                  spotifyApi.createPlaylist(me.id, playlistJSON, function(err, data){
+                      if(err)
+                          console.log(err);
+                      else{
+                        playlistCreated = data;
+                        spotifyApi.addTracksToPlaylist(me.id, playlistCreated.id, toAdd, function(err, data){
+                          if(err){console.log(err);}
+                          else{
+                            console.log(data);
+                            console.log("added tracks!");
+                          }
+                        });
+                      }
+                  });
+                    
                 }
               });
             }
