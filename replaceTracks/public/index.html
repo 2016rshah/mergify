@@ -19,6 +19,16 @@
       dt{
         margin:5px;
       }
+      .divAlert{
+        text-align: center;
+        width:57%;
+        margin-right:auto;
+        display:none;
+      }
+      .table{
+        width:57%;
+        text-align:center;
+      }
     </style>
     <script src = "spotify-web-api.js"></script>
   </head>
@@ -26,7 +36,7 @@
   <body>
     <div class="container">
       <div id="login">
-        <h1>This is an example of the Implicit Grant flow</h1>
+        <h1>Welcome to Mergify!</h1>
         <button id="login-button" class="btn btn-primary">Log in with Spotify</button>
       </div>
       <div id="loggedin">
@@ -40,7 +50,7 @@
     <script id="user-profile-template" type="text/x-handlebars-template">
       
       <h1>Logged in as {{display_name}}</h1>
-
+      
 
 
       <div class="media">
@@ -71,6 +81,18 @@
             </div>
           </dl>
         </div>
+      <div id = "success" class="alert alert-success divAlert" role="alert">Success!</div>
+      <div id = "failure" class="alert alert-danger divAlert" role="alert">Something went wrong!</div>
+      <div id = "playlists" class = "table">
+        <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">Your playlists</div>
+
+        <!-- List group -->
+        <ul id = "playlists" class="list-group"></ul>
+      </div>
+    </div>
+
       </div>
     </script>
 
@@ -181,6 +203,7 @@
             spotifyApi = new SpotifyWebApi();
             spotifyApi.setAccessToken(access_token);
             me = "this shouldn't still be here";
+            var playlists;
             spotifyApi.getMe(function(err, data){
               if(err){console.log(err);}
               else{
@@ -189,36 +212,44 @@
                   //createPlaylistOnLoad(spotifyApi, me);
               }
             });
+
+
         // }
 
         function getPlaylistsOnLoad(spotifyApi, me){
-          document.getElementById("start").onclick = function(){
+          var tempJSON = {
+            "limit" : 49,
+            "offset":0
+          }
+          spotifyApi.getUserPlaylists(me.id, tempJSON, function(err, data){
+              if(err){console.log(err);}
+              else{
+                playlists = data.items;
+                displayPlaylists(playlists);
+                matchPlaylists(spotifyApi, me, playlists);
+              }
+          });
+        }
 
-            var tempJSON = {
-              "limit" : 49,
-              "offset":0
-            }
-            spotifyApi.getUserPlaylists(me.id, tempJSON, function(err, data){
-                if(err){console.log(err);}
-                else{
-                  playlists = data.items;
-                  playlist1 = playlists.filter(function(e){
-                    return e.name == $("#playlist1").val();
-                  });
-                  playlist1 = playlist1[0];
-                  console.log(playlist1);
-                  playlist2 = playlists.filter(function(e){
-                    return e.name == $("#playlist2").val();
-                  });
-                  playlist2 = playlist2[0];
-                  console.log(playlist2);
-                  if(playlist1!==undefined && playlist2!==undefined){
-                    mergeTracks(spotifyApi, me, playlist1, playlist2);
-                  }
-                }
+        function matchPlaylists(spotifyApi, me, playlists){
+          document.getElementById("start").onclick = function(){
+            playlist1 = playlists.filter(function(e){
+              return e.name == $("#playlist1").val();
             });
+            playlist1 = playlist1[0];
+            playlist2 = playlists.filter(function(e){
+              return e.name == $("#playlist2").val();
+            });
+            playlist2 = playlist2[0];
+            if(playlist1!==undefined && playlist2!==undefined){
+              mergeTracks(spotifyApi, me, playlist1, playlist2);
+            }
+            else{
+              $("#failure").show();
+            }
           }
         }
+
         function createPlaylistOnLoad(spotifyApi, me){
           playlistJSON = {
             "name":"Test2",
@@ -233,17 +264,14 @@
                   });
         }
         function mergeTracks(spotifyApi, me, playlist1, playlist2){
-          console.log("tracks!");
           spotifyApi.getPlaylistTracks(me.id, playlist1.id, function(err, data){
             if(err){console.log(err);}
             else{
               tracks1 = data.items;
-              console.log(tracks1);
               spotifyApi.getPlaylistTracks(me.id, playlist2.id, function(err, data){
                 if(err){console.log(err);}
                 else{
                   tracks2 = data.items;
-                  console.log(tracks2);
                   var toAdd = []
                   for(var i = 0; i<tracks1.length; i++){
                     toAdd.push(tracks1[i].track.uri);
@@ -261,10 +289,12 @@
                       else{
                         playlistCreated = data;
                         spotifyApi.addTracksToPlaylist(me.id, playlistCreated.id, toAdd, function(err, data){
-                          if(err){console.log(err);}
+                          if(err){console.log(err);$("#failure").show();$("#success").hide();}
                           else{
                             console.log(data);
-                            console.log("added tracks!");
+                            $("#success").show();
+                            $("#playlists ul").prepend('<li class="list-group-item">'+playlistCreated.name+'</li>');
+                            $("#failure").hide();
                           }
                         });
                       }
@@ -274,7 +304,12 @@
               });
             }
           });
-          
+        }
+
+        function displayPlaylists(playlists){
+          for(var i = 0; i<playlists.length; i++){
+            $("#playlists ul").append('<li class="list-group-item">'+playlists[i].name+'</li>');
+          }
         }
     </script>
 </html>
