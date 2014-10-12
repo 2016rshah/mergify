@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Example of the Implicit Grant flow with Spotify</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">    
     <style type="text/css">
       #login, #loggedin {
         display: none;
@@ -19,6 +19,7 @@
 
   <body>
     <div id = "accessToken">stuff</div>
+    <div id = "playlist1">
     <div class="container">
       <div id="login">
         <h1>This is an example of the Implicit Grant flow</h1>
@@ -110,7 +111,6 @@
         access_token = params.access_token;
         var state = params.state,
             storedState = localStorage.getItem(stateKey);
-        console.log(access_token);
         $("#accessToken").text(access_token);
 
         if (access_token && (state == null || state !== storedState)) {
@@ -143,7 +143,7 @@
             var state = generateRandomString(16);
 
             localStorage.setItem(stateKey, state);
-            var scope = 'user-read-private user-read-email';
+            var scope = 'playlist-read-private user-read-private user-read-email';
 
             var url = 'https://accounts.spotify.com/authorize';
             url += '?response_type=token';
@@ -153,15 +153,35 @@
             url += '&state=' + encodeURIComponent(state);
 
             window.location = url;
-            onAuthorize();
+            // onAuthorize();
           }, false);
         }
       })();
-        function onAuthorize(){
-            var spotifyApi = new SpotifyWebApi();
+        // function onAuthorize(){
+            spotifyApi = new SpotifyWebApi();
             spotifyApi.setAccessToken(access_token);
-            spotifyApi.getMe(function(err, data){me = data});
-            // spotifyApi.getUserPlaylists(me.id, function(err, data){console.log(data)});
+            var me = "this shouldn't still be here";
+            var playlists;
+            spotifyApi.getMe(function(err, data){
+              if(err){console.log(err);}
+              else{
+                me = data;
+                spotifyApi.getUserPlaylists(me.id, function(err, data){
+                  if(err){console.log(err);}
+                  else{
+                    console.log("success");
+                    playlists = data.items;
+                    playlist = playlists.filter(function(e){
+                      //this happens way too early for there to be text in playlist1
+                      e.name == $("#playlist1").val();
+                    });
+                    playlist = playlist[0];
+                    console.log(playlist);
+                  }
+                });
+              }
+            });
+            
             // var playlistJSON = {
             //   "name": "Test1",
             //   "public" : false
@@ -173,6 +193,6 @@
             //       console.log(data)
             //   }
             // });
-        }
+        // }
     </script>
 </html>
