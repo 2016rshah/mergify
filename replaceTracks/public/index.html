@@ -3,8 +3,37 @@
 
 <head>
     <title>Mergify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
     <style type="text/css">
+        @media screen and (min-width : 320px) and (max-width : 480px) {
+            .table{
+                width: 100%;
+            }
+            .divAlert{
+                width:100%;
+                margin-right:auto;
+                margin-left:auto;
+            }
+            .form{
+                width:100%;
+                margin-right:auto;
+                margin-left:auto;
+            }
+            #playlists{
+                width:100%;
+                margin-right:auto;
+                margin-left:auto;
+            }
+            .pull-left{
+                display:none;
+            }
+            #playlistForm{
+                width:100%;
+                margin-right:auto;
+                margin-left:auto;
+            }
+        }
         #login,
         #loggedin {
             display: none;
@@ -38,6 +67,19 @@
         h3 {
             margin-top: 10px;
             margin-bottom: 10px;
+        }
+        .footer{
+            height: 4em;
+            text-align:center;
+            background-color: #eee;
+            
+        }
+        .footer-text{
+            color : #000;
+            text-align:center;
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
         }
     </style>
     <script src="spotify-web-api.js"></script>
@@ -185,7 +227,8 @@
                 document.getElementById('login-button').addEventListener('click', function() {
 
                     var client_id = 'c5420045770248e9846f1c2c20721cea'; // Your client id
-                    var redirect_uri = 'http://mergify.jit.su/'; // Your redirect uri
+                    // var redirect_uri = 'http://mergify.jit.su/'; // Your redirect uri
+                    var redirect_uri = 'http://localhost:8888/';
 
                     var state = generateRandomString(16);
 
@@ -320,4 +363,13 @@
         }
     </script>
 
+
+
+    <div class="footer navbar-fixed-bottom">
+        <div class="footer-text">
+            <a class="btn btn-primary" href="https://www.facebook.com/sharer/sharer.php?u=mergify.jit.su" target="_blank" style="margin:3px"><span class = "glyphicon glyphicon-thumbs-up"></span></a> Made with <span class="glyphicon glyphicon-heart-empty"></span> by Rushi Shah
+            <a class="btn btn-primary" href="http://twitter.com/share?url=http%3A%2F%2Fmergify.jit.su" target="_blank" style="margin:3px"><span class = "glyphicon glyphicon-edit"></span></a>
+        </div>
+    </div>
+</body>
 </html>
