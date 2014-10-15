@@ -69,6 +69,7 @@
             margin-bottom: 10px;
         }
         .footer{
+            margin-top:5px;
             height: 4em;
             text-align:center;
             background-color: #eee;
@@ -80,6 +81,20 @@
             position: relative;
             top: 50%;
             transform: translateY(-50%);
+        }
+        .radios{
+            margin:5px;
+        }
+        .tbmargins{
+            margin-top:10px;
+            margin-bottom:10px;
+        }
+        input[value="no"]{
+            margin-left: 25px;
+            margin-right:3px;
+        } 
+        input[value="yes"]{
+            margin-right:3px;
         }
     </style>
     <script src="spotify-web-api.js"></script>
@@ -111,22 +126,35 @@
                 <dl class="dl-horizontal">
                     <div id="playlistForm" class="form">
                         <form>
-                            <dt>Playlist 1: </dt>
-                            <dd>
-                                <input id="playlist1" type="text" placeholder="First Playlist" class="form-control">
-                            </dd>
-                            <br>
-                            <dt>Playlist 2: </dt>
-                            <dd>
-                                <input id="playlist2" type="text" placeholder="Second Playlist" class="form-control">
-                            </dd>
-                            <br>
-                            <dt>New Name: </dt>
-                            <dd>
-                                <input id="newName" type="text" placeholder="New Name for Playlist" class="form-control">
-                            </dd>
+                            <div class = "tbmargins">
+                                <dt>Playlist 1: </dt>
+                                <dd>
+                                    <input id="playlist1" type="text" placeholder="First Playlist" class="form-control">
+                                </dd>
+                            </div class = "tbmargins">
+                            <div>
+                                <dt>Playlist 2: </dt>
+                                <dd>
+                                    <input id="playlist2" type="text" placeholder="Second Playlist" class="form-control">
+                                </dd>
+                            </div>
+                            <div class = "tbmargins">
+                                <dt>New Name: </dt>
+                                <dd>
+                                    <input id="newName" type="text" placeholder="New Name for Playlist" class="form-control">
+                                </dd>
+                            </div>
+                            <div class = "tbmargins">
+                                <dt>Add duplicates: </dt>
+                                <dd>
+                                    <div class = "radios">
+                                        <input type = "radio" name = "duplicates" value = "yes">Yes</input>
+                                        <input type = "radio" name = "duplicates" value = "no">No</input>
+                                    </div>
+                                </dd>
+                            </div>
                         </form>
-                        <br>
+                        
                         <dd>
                             <button id="start" class="btn btn-primary btn-block">Start!</button>
                         </dd>
@@ -142,6 +170,7 @@
 
                     <!-- List group -->
                     <ul id="playlists" class="list-group"></ul>
+                    <li class="list-group-item tbmargins"></li>
                 </div>
     </script>
     <script id="oauth-template" type="text/x-handlebars-template">
@@ -227,7 +256,7 @@
                 document.getElementById('login-button').addEventListener('click', function() {
 
                     var client_id = 'c5420045770248e9846f1c2c20721cea'; // Your client id
-                    // var redirect_uri = 'http://mergify.jit.su/'; // Your redirect uri
+                    //var redirect_uri = 'http://localhost:8888/'; // Your redirect uri
                     var redirect_uri = 'http://mergify.jit.su/';
 
                     var state = generateRandomString(16);
@@ -247,6 +276,7 @@
                 }, false);
             }
         })();
+        var toAdd = []
         spotifyApi = new SpotifyWebApi();
         spotifyApi.setAccessToken(access_token);
         me = "this shouldn't still be here";
@@ -319,7 +349,7 @@
                             console.log(err);
                         } else {
                             tracks2 = data.items;
-                            var toAdd = []
+                            toAdd = []
                             for (var i = 0; i < tracks1.length; i++) {
                                 toAdd.push(tracks1[i].track.uri);
                             }
@@ -335,6 +365,9 @@
                                     console.log(err);
                                 else {
                                     playlistCreated = data;
+                                    if($("input[name=duplicates]:checked").val() === "no"){
+                                        toAdd = toAdd.filter(function(v, i, a){return a.indexOf(v) == i});
+                                    }
                                     spotifyApi.addTracksToPlaylist(me.id, playlistCreated.id, toAdd, function(err, data) {
                                         if (err) {
                                             console.log(err);
