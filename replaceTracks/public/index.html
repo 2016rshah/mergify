@@ -368,18 +368,26 @@
                                     if($("input[name=duplicates]:checked").val() === "no"){
                                         toAdd = toAdd.filter(function(v, i, a){return a.indexOf(v) == i});
                                     }
-                                    spotifyApi.addTracksToPlaylist(me.id, playlistCreated.id, toAdd, function(err, data) {
-                                        if (err) {
-                                            console.log(err);
-                                            $("#failure").show();
-                                            $("#success").hide();
-                                        } else {
-                                            console.log(data);
-                                            $("#success").show();
-                                            $("#playlists ul").prepend('<li class="list-group-item">' + playlistCreated.name + '</li>');
-                                            $("#failure").hide();
-                                        }
-                                    });
+                                    var i,j,temparray,chunk = 99;
+                                    var s = true
+                                    for (i=0,j=toAdd.length; i<j; i+=chunk) {
+                                        temparray = toAdd.slice(i,i+chunk);
+                                        spotifyApi.addTracksToPlaylist(me.id, playlistCreated.id, temparray, function(err, data) {
+                                            if (err) {
+                                                console.log(err);
+                                                $("#failure").show();
+                                                $("#success").hide();
+                                                s = false;
+                                            } else {
+                                                console.log(data);
+                                            }
+                                        });
+                                    }
+                                    if(s){
+                                        $("#success").show();
+                                        $("#playlists ul").prepend('<li class="list-group-item">' + playlistCreated.name + '</li>');
+                                        $("#failure").hide();
+                                    }
                                 }
                             });
 
