@@ -4,7 +4,7 @@ function authorize(){
 	var client_secret = CLIENT_SECRET; // Your client secret
 	var spotURL = "https://accounts.spotify.com/authorize"
 	spotURL += "?client_id="+client_id;
-	spotURL += "&redirect_uri="+encodeURIComponent("https://www.google.com/");
+	spotURL += "&redirect_uri="+encodeURIComponent("http://localhost:8888/callback/");
 	spotURL += "&response_type=token";
 	console.log(spotURL);
 	$.get( spotURL, function( data ) {

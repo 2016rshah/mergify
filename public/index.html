@@ -257,7 +257,7 @@
 
                     var client_id = CLIENT_ID; // Your client id
                     var redirect_uri = 'http://mergify.rshah.io/'; // Your redirect uri
-                    //var redirect_uri = 'http://mergify.jit.su/';
+                    // var redirect_uri = 'http://localhost:8888/';
 
                     var state = generateRandomString(16);
 
@@ -292,14 +292,21 @@
 
         function getPlaylistsOnLoad(spotifyApi, me) {
             var tempJSON = {
-                "limit": 49,
+                "limit": 50,
                 "offset": 0
             }
             spotifyApi.getUserPlaylists(me.id, tempJSON, function(err, data) {
                 if (err) {
                     console.log(err);
                 } else {
-                    playlists = data.items;
+                    console.log(data)
+                    playlists = []
+                    for(var i = 0; i<data.items.length; i++){
+                        if(data.items[i].owner.id == me.id){
+                            playlists.push(data.items[i])
+                        }
+                    }
+
                     displayPlaylists(playlists);
                     matchPlaylists(spotifyApi, me, playlists);
                 }
